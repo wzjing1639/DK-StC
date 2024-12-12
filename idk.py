@@ -4,6 +4,7 @@ from random import sample
 from scipy.spatial.distance import cdist
 from scipy.sparse import csr_matrix
 from sklearn.neighbors import BallTree
+from sklearn.kernel_approximation import Nystroem
 
 
 class iNN_IK:
@@ -181,3 +182,26 @@ def idkmap(list_of_distributions, psi, t=100):
     idkmap = np.array(idkmap)
 
     return all_ikmap, idkmap, D_idx
+
+
+def gdkmap(list_of_distributions, gma1):
+    gdk_nys = Nystroem(gamma=gma1, n_components=40)
+    D_idx = [0]  # index of each distributions
+    alldata = []
+    n = len(list_of_distributions)
+    for i in range(1, n + 1):
+        D_idx.append(D_idx[i - 1] + len(list_of_distributions[i - 1]))
+        alldata += list_of_distributions[i - 1].tolist()
+    alldata = np.array(alldata)
+
+    all_gdkmap1 = gdk_nys.fit_transform(alldata)
+
+    gdkmap1 = []
+    for i in range(n):
+        gdkmap1.append(np.sum(all_gdkmap1[D_idx[i]:D_idx[i + 1]], axis=0) / (D_idx[i + 1] - D_idx[i]))
+    gdkmap1 = np.array(gdkmap1)
+    gdk = np.zeros((n,n))
+    '''for i in range(n):
+        for j in range(n):
+            gdk[i][j] = np.dot(gdkmap1[i],gdkmap1[j].T)'''
+    return all_gdkmap1, gdkmap1

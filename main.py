@@ -1,6 +1,6 @@
 import numpy as np
 from scipy import io
-from idk import idkmap
+from idk import idkmap, gdkmap
 from dkstc import expand_dataset_seed_auto_filter_recenter
 from evaluation import centerlization, eval_overall_distance, eval_sse
 from utils import idx2trajs, cluster_info, plot_clusters
@@ -25,6 +25,7 @@ if __name__ == "__main__":
 
     print('Building feature map...')
     all_ikmap, idk_map1, D_idx = idkmap(data, psi=psi, t=100)
+    # all_ikmap, idk_map1 = gdkmap(data, gma1=0.0001)
     represent_idk_all = np.array(all_ikmap, dtype=np.float64)
     represent_points = np.array(all_points)
     print('Clustering...')
